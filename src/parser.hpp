@@ -51,8 +51,12 @@ struct NodeStmtLet {
 struct NodeStmtPrint {
     std::vector<NodeExpr*>  expr;
 };
+struct NodeStmtAssign {
+    Token ident;
+    NodeExpr* expr;
+};
 struct NodeStmt {
-    std::variant<NodeStmtExit*, NodeStmtLet*, NodeStmtPrint*> var;
+    std::variant<NodeStmtExit*, NodeStmtLet*, NodeStmtPrint*, NodeStmtAssign*> var;
 };
 struct NodeProg {
     std::vector<NodeStmt*> stmts;
@@ -219,6 +223,21 @@ public:
                 std::cerr << "Expected expression"<<std::endl;
                 exit(EXIT_FAILURE);
             }
+        } else if (auto ident = try_consume(TokenType::ident)) {
+            try_consume(TokenType::eq, "Expected '='.");
+            auto stmt_assign = m_allocator.alloc<NodeStmtAssign>();
+            stmt_assign->ident = ident.value();
+            if (auto expr = parse_expr()) {
+                stmt_assign->expr = expr.value();
+                auto stmt = m_allocator.alloc<NodeStmt>();
+                stmt->var = stmt_assign;
+                try_consume(TokenType::semi, "Expected ';'.");
+                return stmt;
+            } else {
+                std::cerr<<"Expected expression."<<std::endl;
+                exit(EXIT_FAILURE);
+            }
+
         }
         return {};
     }

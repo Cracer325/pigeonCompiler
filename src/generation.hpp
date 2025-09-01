@@ -104,12 +104,12 @@ public:
                    gen->m_vars.insert({stmt_let->ident.value.value(), Var {.stack_loc = gen->m_stack_size}});
                    gen->gen_expr(stmt_let->expr);
                }
-               void operator()(const NodeStmtPrint* stmt_let_print) {
+               void operator()(const NodeStmtPrint* stmt_print) {
                    if (gen->m_resb_size_print == 0) {
                        gen->m_resb_size_print=1;
                        gen->m_output_bss << "    char resb 1\n"; //TODO when adding printing strings, add resb_size_print
                    }
-                   for (const NodeExpr* expr : stmt_let_print->expr) {
+                   for (const NodeExpr* expr : stmt_print->expr) {
                        gen->gen_expr(expr);
                        gen->pop("rax");
                        gen->m_output_text << "    mov [char], al\n";
@@ -118,6 +118,16 @@ public:
                        gen->m_output_text << "    mov rdx, 1\n";
                        gen->m_output_text << "    mov rax, 1\n    syscall\n";
                    }
+               }
+               void operator()(const NodeStmtAssign* stmt_assign) {
+                    if (!gen->m_vars.contains(stmt_assign->ident.value.value())) {
+                        std::cerr << "Identifier not found." << std::endl;
+                        exit(EXIT_FAILURE);
+                    }
+                   auto var = gen->m_vars.find(stmt_assign->ident.value.value())->second;
+                   gen->gen_expr(stmt_assign->expr);
+                   gen->pop("rax");
+                   gen->m_output_text << "    mov QWORD [rsp + " << (gen->m_stack_size-var.stack_loc-1) * 8 << "], rax\n";
                }
            };
 
