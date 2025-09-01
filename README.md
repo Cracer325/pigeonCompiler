@@ -1,5 +1,6 @@
 # Pigeon compiler :)
 a compiler for a very basic language
+<br><strong>Requires NASM x86-64 Linux.</strong>
 ## Explanations:
 there are 3 key words, print, let, and exit
 ### let:
