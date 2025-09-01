@@ -11,9 +11,42 @@ enum class TokenType {
     ident,
     let,
     eq,
-    plus
+    plus,
+    star,
+    minus,
+    slash,
+    print,
+    comma
 
 };
+
+bool is_bin_op(TokenType type) {
+    switch (type) {
+        case TokenType::plus:
+        case TokenType::star:
+        case TokenType::minus:
+        case TokenType::slash:
+            return true;
+        default:
+            return false;
+    }
+}
+
+std::optional<int> get_prec(TokenType type) {
+    switch (type) {
+        case TokenType::minus:
+        case TokenType::plus:
+            return 0;
+        case TokenType::slash:
+        case TokenType::star:
+            return 1;
+        default:
+            return {};
+    }
+}
+
+
+
 struct Token {
     TokenType type;
     std::optional<std::string> value;
@@ -38,6 +71,9 @@ public:
                     buf.clear();
                 } else if (buf == "let") {
                     tokens.push_back({.type =  TokenType::let});
+                    buf.clear();
+                } else if (buf == "print") {
+                    tokens.push_back({.type =  TokenType::print});
                     buf.clear();
                 }
                 else {
@@ -74,7 +110,26 @@ public:
                 tokens.push_back({.type = TokenType::plus});
                 buf.clear();
             }
-
+            else if (peak().value() == '*') {
+                consume();
+                tokens.push_back({.type = TokenType::star});
+                buf.clear();
+            }
+            else if (peak().value() == '/') {
+                consume();
+                tokens.push_back({.type = TokenType::slash});
+                buf.clear();
+            }
+            else if (peak().value() == ',') {
+                consume();
+                tokens.push_back({.type = TokenType::comma});
+                buf.clear();
+            }
+            else if (peak().value() == '-') {
+                consume();
+                tokens.push_back({.type = TokenType::minus});
+                buf.clear();
+            }
             else if (std::isspace(peak().value())) {
                 consume();
             }
