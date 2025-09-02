@@ -24,7 +24,9 @@ $$
 \begin{cases}
 \text{int_lit} \\
 \text{ident} \\
-([\text{Expr}])
+([\text{Expr}]) \\
+-([\text{Expr}]) \\
+\text{'char_lit'}\\
 \end{cases}
 \end{align}
 $$

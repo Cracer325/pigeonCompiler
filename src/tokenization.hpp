@@ -16,8 +16,12 @@ enum class TokenType {
     minus,
     slash,
     print,
-    comma
-
+    comma,
+    open_curly,
+    close_curly,
+    if_,
+    apo,
+    bslash
 };
 
 bool is_bin_op(TokenType type) {
@@ -75,6 +79,9 @@ public:
                 } else if (buf == "print") {
                     tokens.push_back({.type =  TokenType::print});
                     buf.clear();
+                } else if (buf == "if") {
+                    tokens.push_back({.type =  TokenType::if_});
+                    buf.clear();
                 }
                 else {
                     tokens.push_back({.type = TokenType::ident, .value = buf});
@@ -92,6 +99,13 @@ public:
             else if (peak().value() == '(') {
                 consume();
                 tokens.push_back({.type = TokenType::open_paren});
+            } else if (peak().value() == '\'') {
+                consume();
+                tokens.push_back({.type = TokenType::apo});
+            }
+            else if (peak().value() == '\\') {
+                consume();
+                tokens.push_back({.type = TokenType::bslash});
             }
             else if (peak().value() == '=') {
                 consume();
@@ -100,6 +114,14 @@ public:
             else if (peak().value() == ')') {
                 consume();
                 tokens.push_back({.type = TokenType::close_paren});
+            }
+            else if (peak().value() == '{') {
+                consume();
+                tokens.push_back({.type = TokenType::open_curly});
+            }
+            else if (peak().value() == '}') {
+                consume();
+                tokens.push_back({.type = TokenType::close_curly});
             }
             else if (peak().value() == ';') {
                 consume();
